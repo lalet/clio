@@ -1,6 +1,9 @@
 FROM ubuntu:focal
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
+ARG XX_VERSION=1.1.2
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
+COPY --from=xx / /
 
 SHELL ["/bin/bash", "-c"]
 USER root
@@ -14,8 +17,8 @@ ENV GCC_VERSION=11 \
     DOXYGEN_VERSION=1.10.0
  
 # Add repositories
-RUN apt-get -qq update \
-    && apt-get -qq install -y --no-install-recommends --no-install-suggests gnupg wget curl software-properties-common \
+RUN xx-apt-get -qq update \
+    && xx-apt-get -qq install -y --no-install-recommends --no-install-suggests gnupg wget curl software-properties-common \
     && add-apt-repository -y ppa:ubuntu-toolchain-r/test \
     && wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - \
     && apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main' \
@@ -23,8 +26,8 @@ RUN apt-get -qq update \
     && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 
 # Install packages
-RUN apt update -qq \
-    && apt install -y --no-install-recommends --no-install-suggests cmake python3 python3-pip sudo git git-lfs libmpc-dev libgmp3-dev libmpfr-dev \
+RUN xx-apt update -qq \
+    && xx-apt install -y --no-install-recommends --no-install-suggests cmake python3 python3-pip sudo git git-lfs libmpc-dev libgmp3-dev libmpfr-dev \
     ninja-build make pkg-config libzstd-dev libzstd1 g++-${GCC_VERSION} flex bison jq graphviz \
     clang-format-${LLVM_TOOLS_VERSION} clang-tidy-${LLVM_TOOLS_VERSION} clang-tools-${LLVM_TOOLS_VERSION} \
     && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} 100 \
@@ -35,7 +38,7 @@ RUN apt update -qq \
     && update-alternatives --install /usr/bin/gcov-dump gcov-dump /usr/bin/gcov-dump-${GCC_VERSION} 100 \
     && update-alternatives --install /usr/bin/gcov-tool gcov-tool /usr/bin/gcov-tool-${GCC_VERSION} 100 \
     && update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-${LLVM_TOOLS_VERSION} 100 \
-    && apt-get clean && apt remove -y software-properties-common \
+    && xx-apt-get clean && apt remove -y software-properties-common \
     && pip3 install -q --upgrade --no-cache-dir pip \
     && pip3 install -q --no-cache-dir conan==1.62 gcovr cmake-format
 
