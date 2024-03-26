@@ -1,8 +1,11 @@
-FROM ubuntu:focal
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 ARG XX_VERSION=1.1.2
+
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
+
+FROM ubuntu:focal
+
 COPY --from=xx / /
 
 SHELL ["/bin/bash", "-c"]
