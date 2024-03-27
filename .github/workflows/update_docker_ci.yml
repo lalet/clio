@@ -34,7 +34,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          timeout-minutes: 720
           context: ${{ github.workspace }}/docker/ci
           platforms: linux/amd64,linux/arm64
           push: false
