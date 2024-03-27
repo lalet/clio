@@ -1,10 +1,12 @@
-ARG DEBIAN_FRONTEND=noninteractive
-ARG TARGETARCH
+
 ARG XX_VERSION=1.1.2
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 
 FROM ubuntu:focal
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG TARGETARCH
 
 COPY --from=xx / /
 
